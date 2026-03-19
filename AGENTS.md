@@ -9,20 +9,17 @@
 ## Estrutura
 ```
 src/
-├── app/                    # Pages (App Router)
-├── components/
-│   ├── ui/                 # Componentes reutilizáveis
-│   ├── code-editor.tsx     # Editor de código
-│   └── navbar.tsx          # Navbar
-└── lib/
-    └── utils.ts            # cn()
+├── app/          # Pages (App Router)
+├── components/   # Componentes React
+│   ├── ui/       # Componentes reutilizáveis (Button, Card, etc.)
+│   └── *.tsx     # Componentes maiores/específicos (Navbar, CodeEditor)
+└── lib/          # Utilitários
 ```
 
 ## Padrões
 - **Named exports** sempre (sem default exports)
-- **Tokens Tailwind** padrão: `bg-primary`, `text-text-secondary`, etc.
+- **Tokens Tailwind**: `bg-primary`, `text-text-secondary`, `accent-green`, etc.
 - **Fontes**: `font-primary` (JetBrains Mono), `font-secondary` (sans-serif)
-- **Componentes grandes** (CodeEditor, Navbar) ficam fora de `ui/`
 - **Server Components** para componentes pesados (shiki)
 
 ## Cores
