@@ -1,4 +1,4 @@
-# Padrões para Criação de Componentes UI
+# Padrões para Componentes UI
 
 ## Visão Geral
 
@@ -10,7 +10,7 @@ Este documento estabelece os padrões para criação de componentes UI neste pro
 - **Estilização**: Tailwind CSS v4
 - **Variants**: tailwind-variants (tv)
 - **Utils**: clsx + tailwind-merge (cn)
-- **UI Primitives**: @base-ui/react (comportamentos), @radix-ui/react-switch (toggle)
+- **UI Primitives**: @base-ui/react, @radix-ui/react-switch
 - **Syntax Highlighting**: shiki (tema vesper)
 - **Linting**: Biome (2 espaços)
 - **Linguagem**: TypeScript
@@ -18,24 +18,27 @@ Este documento estabelece os padrões para criação de componentes UI neste pro
 ## Estrutura de Arquivos
 
 ```
-src/
-├── components/
-│   ├── ui/
-│   │   └── <component-name>.tsx    # Componentes UI pequenos e reutilizáveis
-│   ├── code-editor.tsx             # Editor de código (maior, específico)
-│   └── navbar.tsx                  # Navbar (maior, específico)
-└── lib/
-    └── utils.ts
+src/components/
+├── ui/
+│   ├── button.tsx          # Botões
+│   ├── card.tsx            # Cards
+│   ├── code-block.tsx      # Bloco de código com shiki
+│   ├── badge.tsx           # Badges e dots
+│   ├── toggle.tsx          # Toggle switch
+│   ├── table.tsx           # Tabela
+│   ├── diff-line.tsx       # Linha de diff
+│   ├── score-ring.tsx      # Score circular com gradiente
+│   ├── issue-card.tsx      # Card de análise de issues
+│   └── leaderboard-entry.tsx # Card de entrada do leaderboard
+├── code-editor.tsx         # Editor de código (maior, específico)
+└── navbar.tsx             # Navbar (maior, específico)
 ```
-
-> **Nota**: Componentes maiores e pouco reaproveitáveis (como `CodeEditor` e `Navbar`) ficam na raiz de `src/components/`, fora da pasta `ui/`.
 
 ## Fontes
 
-- **Texto tradicional**: sans-serif (padrão do sistema)
-- **Texto monospaced**: JetBrains Mono (via token `font-primary`)
+- **Texto tradicional**: `font-secondary` (sans-serif)
+- **Texto monospaced**: `font-primary` (JetBrains Mono)
 
-Para usar a fonte monospaced em componentes, use o token `font-primary`:
 ```typescript
 class="font-primary"
 ```
@@ -70,52 +73,43 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 ### 3. Variants com tailwind-variants
 
-Use `tv` para criar variantes do componente. Para casos onde cada variante tem seu próprio tamanho e font específicos, use `variantSize` com `compoundVariants`.
+Use `tv` para criar variantes do componente.
 
 ```typescript
 import { tv, type VariantProps } from "tailwind-variants";
 import { cn } from "@/lib/utils";
 
-const componentVariants = tv({
-  base: "base-classes-obrigatorias",
+const buttonVariants = tv({
+  base: "inline-flex items-center justify-center gap-2 font-medium transition-colors",
   variants: {
     variant: {
-      primary: "bg-primary text-primary-foreground",
-      secondary: "bg-secondary text-secondary-foreground",
+      primary: "bg-primary text-primary-foreground hover:bg-primary/90",
+      secondary: "border border-border-primary bg-transparent hover:bg-surface",
     },
-    variantSize: {
-      primary: "py-2.5 px-6 text-[13px] font-medium",
-      secondary: "py-2 px-4 text-[12px] font-normal",
+    size: {
+      sm: "h-8 px-3 text-xs",
+      md: "h-10 px-4 text-sm",
     },
   },
-  compoundVariants: [
-    {
-      variant: "primary",
-      variantSize: "primary",
-      class: "font-[family-name:var(--font-primary)]",
-    },
-  ],
   defaultVariants: {
     variant: "primary",
-    variantSize: "primary",
+    size: "md",
   },
 });
 ```
 
-### 4. Usar Tokens do Tema (Formato Padrão Tailwind)
+### 4. Tokens do Tema (Formato Padrão Tailwind)
 
-**SEMPRE** use os tokens no formato padrão do Tailwind. Não use a sintaxe `var()`.
+**SEMPRE** use os tokens no formato padrão do Tailwind.
 
 ```typescript
-// ✅ Correto - formato padrão Tailwind
+// ✅ Correto
 "bg-primary"
 "text-foreground"
-"border-border"
-"bg-muted"
+"border-border-primary"
 
-// ❌ Errado - usando var()
+// ❌ Errado
 "bg-[var(--color-primary)]"
-"text-[var(--color-foreground)]"
 ```
 
 ### 5. Forward Ref
@@ -123,69 +117,54 @@ const componentVariants = tv({
 Use `forwardRef` para permitir ref forwarding.
 
 ```typescript
-const Component = forwardRef<HTMLElementType, ComponentProps>(
-  ({ className, ...props }, ref) => {
-    return <element ref={ref} className={cn(...)} {...props} />;
+const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant, size, ...props }, ref) => {
+    return (
+      <button
+        ref={ref}
+        className={cn(buttonVariants({ variant, size, className }))}
+        {...props}
+      />
+    );
   }
 );
-Component.displayName = "Component";
+Button.displayName = "Button";
 ```
 
-### 6. Usar Next.js Link
+### 6. Server Components para Componentes Pesados
 
-Quando um botão precisar funcionar como link, use `asChild` com `Link` do Next.js.
-
-```typescript
-import Link from "next/link";
-
-// No componente Button:
-const Comp = asChild ? Link : "button";
-
-if (asChild) {
-  const { href, ...linkProps } = props;
-  return <Link href={href || "/"} {...linkProps} />;
-}
-```
-
-Uso:
-```tsx
-<Button asChild>
-  <Link href="/dashboard">Dashboard</Link>
-</Button>
-```
-
-### 7. Server Components para CodeBlock
-
-Componentes que usam shiki ou outras bibliotecas de renderização pesada devem ser Server Components.
+Componentes que usam shiki devem ser Server Components.
 
 ```typescript
 // code-block.tsx (Server Component)
 export async function CodeBlock({ code, lang = "javascript" }: CodeBlockProps) {
-  const html = await codeToHtml(code, {
-    lang,
-    theme: "vesper",
-  });
-
+  const html = await codeToHtml(code, { lang, theme: "vesper" });
   return <div dangerouslySetInnerHTML={{ __html: html }} />;
 }
 ```
 
-### 8. Arquivo utils.ts
+## Componentes UI e Animados
 
-Mantenha o utilitário `cn` em `src/lib/utils.ts`.
+### Componentes UI Disponíveis
 
-```typescript
-import { type ClassValue, clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
+| Componente | Arquivo | Descrição |
+|------------|---------|-----------|
+| Button | button.tsx | Botões com variants |
+| Toggle | toggle.tsx | Toggle switch (Radix) |
+| Badge | badge.tsx | Badges e BadgeDot |
+| Card | card.tsx | Card com Header, Title, Description |
+| CodeBlock | code-block.tsx | Syntax highlighting (Server) |
+| DiffLine | diff-line.tsx | Linha de diff |
+| Table | table.tsx | Tabela |
+| ScoreRing | score-ring.tsx | Score circular com gradiente |
+| IssueCard | issue-card.tsx | Card de análise de issues |
+| LeaderboardEntry | leaderboard-entry.tsx | Card de entrada do leaderboard |
 
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
-```
+### Componentes de Animação
 
-### 9. Adicionar à Página de Exemplos
-
-Todo novo componente deve ser adicionado à página `/exemplos` com exemplos de suas variações.
+| Componente | Arquivo | Descrição |
+|------------|---------|-----------|
+| AnimatedNumber | animated-number.tsx | Número animado com number-flow |
 
 ## Tokens Disponíveis
 
@@ -193,172 +172,87 @@ Todo novo componente deve ser adicionado à página `/exemplos` com exemplos de 
 
 | Token | Uso |
 |-------|-----|
-| `primary` | Cor principal da marca |
+| `primary` | Cor principal da marca (#FF8400) |
 | `primary-foreground` | Texto sobre primary |
 | `secondary` | Cor secundária |
-| `secondary-foreground` | Texto sobre secondary |
-| `destructive` | Ações destructivas |
-| `muted` | Fundos sutis |
-| `muted-foreground` | Texto em background muted |
-| `accent` | Destaque |
-| `accent-foreground` | Texto sobre accent |
 | `background` | Background da página |
 | `foreground` | Texto principal |
 | `card` | Background de cards |
-| `card-foreground` | Texto em cards |
 | `border` | Bordas |
-| `border-primary` | Bordas principais |
-| `border-secondary` | Bordas secundárias |
-| `input` | Inputs |
-| `ring` | Focus rings |
-| `popover` | Popovers |
-| `popover-foreground` | Texto em popovers |
-
-### Cores Semânticas
-
-| Token | Descrição |
-|-------|-----------|
-| `success` | Background sucesso |
-| `success-foreground` | Texto sucesso |
-| `warning` | Background aviso |
-| `warning-foreground` | Texto aviso |
-| `error` | Background erro |
-| `error-foreground` | Texto erro |
-| `info` | Background info |
-| `info-foreground` | Texto info |
+| `border-primary` | Bordas principais (#2A2A2A) |
 
 ### Accent Colors
 
-| Token |
-|-------|
-| `accent-green` |
-| `accent-amber` |
-| `accent-red` |
-| `accent-cyan` |
-| `accent-blue` |
+| Token | Cor |
+|-------|-----|
+| `accent-green` | #22C55E |
+| `accent-amber` | #F59E0B |
+| `accent-red` | #EF4444 |
+| `accent-cyan` | #06B6D4 |
 
-### Text
+### Text Colors
 
-| Token |
-|-------|
-| `text-primary` |
-| `text-secondary` |
-| `text-tertiary` |
-| `text-muted` |
+| Token | Uso |
+|-------|-----|
+| `text-primary` | Texto principal (light) |
+| `text-secondary` | Texto secundário |
+| `text-tertiary` | Texto terciário |
+| `text-muted` | Texto muted |
 
-### Radius
+### Background Colors
 
-| Token | Valor |
-|-------|-------|
-| `radius-none` | 0 |
-| `radius-sm` | 4px |
-| `radius-md` | 8px |
-| `radius-lg` | 16px |
-| `radius-pill` | 9999px |
+| Token | Cor |
+|-------|-----|
+| `bg-page` | #0A0A0A |
+| `bg-surface` | #0F0F0F |
+| `bg-input` | #111111 |
+| `bg-surface-elevated` | #1A1A1A |
 
-### Font
+## Pattern: CodeBlock com showHeader
 
-| Token | Descrição |
-|-------|-----------|
-| `font-primary` | JetBrains Mono (monospaced) |
-| `font-secondary` | sans-serif (padrão do sistema) |
+O `CodeBlock` tem prop `showHeader` para controlar se mostra o header com bolinhas coloridas.
 
-## Componentes UI Disponíveis
+```typescript
+// Com header (padrão) - para exibição standalone
+<CodeBlock code={code} lang="javascript" />
 
-| Componente | Arquivo | Biblioteca |
-|------------|---------|-----------|
-| Button | button.tsx | - |
-| Toggle | toggle.tsx | @radix-ui/react-switch |
-| Badge | badge.tsx | - |
-| BadgeDot | badge.tsx | - |
-| Card | card.tsx | - |
-| CardHeader | card.tsx | - |
-| CardTitle | card.tsx | - |
-| CardDescription | card.tsx | - |
-| CodeBlock | code-block.tsx | shiki (server) |
-| DiffLine | diff-line.tsx | - |
-| Table | table.tsx | - |
-| TableHeader | table.tsx | - |
-| TableBody | table.tsx | - |
-| TableRow | table.tsx | - |
-| TableHead | table.tsx | - |
-| TableCell | table.tsx | - |
+// Sem header - para uso em cards/containers
+<CodeBlock code={code} lang="javascript" showHeader={false} />
+```
 
-## Outros Componentes
+## Pattern: ScoreRing com Gradiente
 
-| Componente | Arquivo | Descrição |
-|------------|---------|-----------|
-| CodeEditor | code-editor.tsx | Editor de código com textarea |
-| Navbar | navbar.tsx | Barra de navegação do site |
+O `ScoreRing` usa gradiente vermelho → âmbar → verde baseado no score.
+
+```typescript
+// Score < 3: vermelho
+// Score 3-6: âmbar
+// Score > 6: verde
+<ScoreRing score={3.5} maxScore={10} />
+```
+
+## Pattern: IssueCard com Severity
+
+O `IssueCard` mostra severidade com cor e badge.
+
+```typescript
+<IssueCard
+  severity="error"
+  line={10}
+  message="Using 'var' instead of 'const'"
+  suggestion="Use const or let instead"
+/>
+```
 
 ## Checklist de Criação de Componente
 
 - [ ] Criar arquivo em `src/components/ui/<nome>.tsx`
 - [ ] Usar named exports
 - [ ] Estender props nativas do HTML
-- [ ] Usar `forwardRef`
 - [ ] Usar `tv` para variantes
-- [ ] Usar tokens no formato padrão Tailwind (ex: `bg-primary`, não `bg-[var(--color-primary)]`)
+- [ ] Usar tokens no formato padrão Tailwind
 - [ ] Usar `cn()` para mesclar classes
 - [ ] Adicionar `displayName`
-- [ ] Para links, usar `Link` do Next.js com `asChild`
-- [ ] Para componentes pesados (shiki), usar Server Component
+- [ ] Para shiki, usar Server Component
 - [ ] Adicionar exemplo na página `/exemplos`
-- [ ] Testar lint e build
-
-## Exemplo Completo
-
-```typescript
-import { type HTMLAttributes, forwardRef } from "react";
-
-import { tv, type VariantProps } from "tailwind-variants";
-
-import { cn } from "@/lib/utils";
-
-const componentVariants = tv({
-  base: "base-classes-with-tokens",
-  variants: {
-    variant: {
-      primary: "bg-primary text-primary-foreground",
-      secondary: "bg-secondary text-secondary-foreground",
-    },
-    variantSize: {
-      primary: "py-2.5 px-6 text-[13px] font-medium",
-      secondary: "py-2 px-4 text-[12px] font-normal",
-    },
-  },
-  compoundVariants: [
-    {
-      variant: "primary",
-      variantSize: "primary",
-      class: "font-[family-name:var(--font-primary)]",
-    },
-  ],
-  defaultVariants: {
-    variant: "primary",
-    variantSize: "primary",
-  },
-});
-
-export interface ComponentProps
-  extends HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof componentVariants> {
-  // custom props
-}
-
-const Component = forwardRef<HTMLDivElement, ComponentProps>(
-  ({ className, variant, variantSize, ...props }, ref) => {
-    return (
-      <div
-        className={cn(componentVariants({ variant, variantSize, className }))}
-        ref={ref}
-        {...props}
-      />
-    );
-  }
-);
-
-Component.displayName = "Component";
-
-export { Component, componentVariants };
-```
+- [ ] Testar lint
