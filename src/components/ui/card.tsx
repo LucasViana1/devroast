@@ -61,4 +61,4 @@ const CardDescription = forwardRef<HTMLParagraphElement, CardDescriptionProps>(
 
 CardDescription.displayName = "CardDescription";
 
-export { Card, CardHeader, CardTitle, CardDescription };
+export { Card, CardDescription, CardHeader, CardTitle };

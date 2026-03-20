@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { CodeEditor } from "@/components/code-editor";
+import { LanguageSelector } from "@/components/language-selector";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -17,6 +18,15 @@ import { Toggle } from "@/components/ui/toggle";
 
 export default function Home() {
   const [roastMode, setRoastMode] = useState(false);
+  const [code, setCode] = useState("");
+  const [language, setLanguage] = useState<string | undefined>(undefined);
+  const [detectedLanguage, setDetectedLanguage] = useState<string | undefined>();
+
+  const handleLanguageDetect = (detected: string) => {
+    console.log(detected)
+    setDetectedLanguage(detected);
+    setLanguage(detected);
+  };
 
   return (
     <main className="min-h-screen bg-background">
@@ -35,12 +45,23 @@ export default function Home() {
 
           <div className="mb-8">
             <Card>
-              <div className="mb-3 flex items-center gap-2">
-                <div className="h-3 w-3 rounded-full bg-accent-red" />
-                <div className="h-3 w-3 rounded-full bg-accent-amber" />
-                <div className="h-3 w-3 rounded-full bg-accent-green" />
+              <div className="mb-3 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="h-3 w-3 rounded-full bg-accent-red" />
+                  <div className="h-3 w-3 rounded-full bg-accent-amber" />
+                  <div className="h-3 w-3 rounded-full bg-accent-green" />
+                </div>
+                <LanguageSelector
+                  value={language}
+                  onChange={setLanguage}
+                  detectedLanguage={detectedLanguage}
+                />
               </div>
               <CodeEditor
+                value={code}
+                onChange={setCode}
+                language={language}
+                onLanguageChange={handleLanguageDetect}
                 placeholder={`// Paste your code here and get roasted!
 function add(a, b) {
   return a + b;
