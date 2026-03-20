@@ -31,3 +31,7 @@ src/
 
 ## Componentes UI
 Ver `src/components/ui/AGENTS.md`
+
+## Validação
+- Nas validações, rode apenas `npm run lint` por padrão
+- Execute `npm run build` apenas quando o usuário solicitar explicitamente

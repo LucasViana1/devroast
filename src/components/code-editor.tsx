@@ -23,11 +23,13 @@ export interface CodeEditorProps
   language?: string;
   onLanguageChange?: (language: string) => void;
   showLineNumbers?: boolean;
+  isLimitExceeded?: boolean;
   className?: string;
 }
 
 const DEBOUNCE_DELAY = 300;
 const LARGE_CODE_THRESHOLD = 1000;
+const MAX_CHARACTERS = 2000;
 
 export function CodeEditor({
   value,
@@ -35,6 +37,7 @@ export function CodeEditor({
   language: controlledLanguage,
   onLanguageChange,
   showLineNumbers = true,
+  isLimitExceeded,
   className,
   ...props
 }: CodeEditorProps) {
@@ -140,57 +143,82 @@ export function CodeEditor({
 
   if (!isClient) {
     return (
-      <div className="flex">
-        {showLineNumbers && (
-          <div className="flex flex-col pr-4 text-right text-text-muted font-primary text-sm select-none">
-            {lineNumbers.map((num) => (
-              <span key={num}>{num}</span>
-            ))}
-          </div>
-        )}
-        <textarea
-          className={cn(
-            codeEditorVariants({ className }),
-            "flex-1 bg-background-secondary p-4 rounded-md border border-border-primary"
+      <div className="flex flex-col overflow-hidden rounded-md border border-border-primary bg-background-secondary max-h-[400px]">
+        <div className="flex flex-1 overflow-hidden">
+          {showLineNumbers && (
+            <div className="flex flex-col pr-4 text-right text-text-muted font-primary text-sm select-none overflow-y-auto">
+              {lineNumbers.map((num) => (
+                <span key={num}>{num}</span>
+              ))}
+            </div>
           )}
-          value={value}
-          onChange={handleChange}
-          spellCheck={false}
-          {...props}
-        />
+          <textarea
+            className={cn(
+              codeEditorVariants({ className }),
+              "flex-1 bg-background-secondary p-4 rounded-md border-0 overflow-y-auto"
+            )}
+            value={value}
+            onChange={handleChange}
+            maxLength={MAX_CHARACTERS}
+            spellCheck={false}
+            {...props}
+          />
+        </div>
+        <div className="flex justify-end px-3 py-1 border-t border-border-primary">
+          <span
+            className={cn(
+              "font-primary text-xs",
+              isLimitExceeded ? "text-accent-red" : "text-text-tertiary"
+            )}
+          >
+            {value.length.toLocaleString()} / {MAX_CHARACTERS.toLocaleString()}
+          </span>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="flex overflow-hidden rounded-md border border-border-primary bg-background-secondary">
-      {showLineNumbers && (
-        <div
-          ref={lineNumbersRef}
-          className="flex flex-col py-4 pr-3 text-right text-text-muted font-primary text-sm select-none overflow-hidden"
-          style={{ minWidth: "2.5rem" }}
-        >
-          {lineNumbers.map((num) => (
-            <span key={num} className="leading-[1.5rem]">
-              {num}
-            </span>
-          ))}
+    <div className="flex flex-col overflow-hidden rounded-md border border-border-primary bg-background-secondary max-h-[400px]">
+      <div className="flex flex-1 overflow-hidden">
+        {showLineNumbers && (
+          <div
+            ref={lineNumbersRef}
+            className="flex flex-col py-4 pr-3 text-right text-text-muted font-primary text-sm select-none overflow-y-auto"
+            style={{ minWidth: "2.5rem" }}
+          >
+            {lineNumbers.map((num) => (
+              <span key={num} className="leading-[1.5rem]">
+                {num}
+              </span>
+            ))}
+          </div>
+        )}
+        <div ref={editorRef} className="flex-1 overflow-y-auto" onScroll={handleScroll}>
+          <DynamicCodeEditor
+            value={value}
+            onChange={handleChange}
+            language={language}
+            maxLength={MAX_CHARACTERS}
+            className={cn(codeEditorVariants({ className }), "bg-transparent !important")}
+            style={{
+              backgroundColor: "transparent",
+              fontFamily: "var(--font-jetbrains-mono), monospace",
+              fontSize: "14px",
+            }}
+            {...props}
+          />
         </div>
-      )}
-      <div ref={editorRef} className="flex-1" onScroll={handleScroll}>
-        <DynamicCodeEditor
-          value={value}
-          onChange={handleChange}
-          language={language}
-          className={cn(codeEditorVariants({ className }), "bg-transparent !important")}
-          style={{
-            backgroundColor: "transparent",
-            fontFamily: "var(--font-jetbrains-mono), monospace",
-            fontSize: "14px",
-            minHeight: "300px",
-          }}
-          {...props}
-        />
+      </div>
+      <div className="flex justify-end px-3 py-1 border-t border-border-primary">
+        <span
+          className={cn(
+            "font-primary text-xs",
+            isLimitExceeded ? "text-accent-red" : "text-text-tertiary"
+          )}
+        >
+          {value.length.toLocaleString()} / {MAX_CHARACTERS.toLocaleString()}
+        </span>
       </div>
     </div>
   );

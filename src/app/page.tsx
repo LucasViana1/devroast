@@ -61,6 +61,7 @@ export default function Home() {
                 onChange={setCode}
                 language={language}
                 onLanguageChange={handleLanguageDetect}
+                isLimitExceeded={code.length > 2000}
                 placeholder={`// Paste your code here and get roasted!
 function add(a, b) {
   return a + b;
@@ -79,7 +80,7 @@ function add(a, b) {
               </span>
             </div>
 
-            <Button variant="primary">
+            <Button variant="primary" disabled={code.length > 2000}>
               <span className="text-accent-green">$</span> roast_my_code
             </Button>
           </div>
