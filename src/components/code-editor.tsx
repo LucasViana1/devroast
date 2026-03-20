@@ -40,7 +40,9 @@ export function CodeEditor({
 }: CodeEditorProps) {
   const [language, setLanguage] = useState(controlledLanguage || "javascript");
   const [isClient, setIsClient] = useState(false);
+  const [isManualSelection, setIsManualSelection] = useState(false);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
+  const lastDetectedRef = useRef<string | null>(null);
   const editorRef = useRef<HTMLDivElement>(null);
   const lineNumbersRef = useRef<HTMLDivElement>(null);
   const [lineCount, setLineCount] = useState(1);
@@ -53,9 +55,15 @@ export function CodeEditor({
     setLineCount(value.split("\n").length || 1);
   }, [value]);
 
+  useEffect(() => {
+    if (controlledLanguage && !isManualSelection) {
+      setLanguage(controlledLanguage);
+    }
+  }, [controlledLanguage, isManualSelection]);
+
   const detectLanguage = useCallback(
     (code: string) => {
-      if (controlledLanguage) return;
+      if (isManualSelection) return;
 
       const lines = code.split("\n").length;
       const delay = lines > LARGE_CODE_THRESHOLD ? DEBOUNCE_DELAY : 0;
@@ -84,11 +92,12 @@ export function CodeEditor({
         };
 
         const normalizedLang = langMap[detectedLang] || detectedLang;
+        lastDetectedRef.current = normalizedLang;
         setLanguage(normalizedLang);
         onLanguageChange?.(normalizedLang);
       }, delay);
     },
-    [controlledLanguage, onLanguageChange]
+    [isManualSelection, onLanguageChange]
   );
 
   const handleChange = useCallback(
@@ -121,7 +130,8 @@ export function CodeEditor({
   }, []);
 
   useEffect(() => {
-    if (controlledLanguage) {
+    if (controlledLanguage && controlledLanguage !== lastDetectedRef.current) {
+      setIsManualSelection(true);
       setLanguage(controlledLanguage);
     }
   }, [controlledLanguage]);

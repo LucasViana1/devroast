@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { CodeEditor } from "@/components/code-editor";
 import { Badge, BadgeDot } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -15,6 +18,8 @@ import {
 import { Toggle } from "@/components/ui/toggle";
 
 export default function ExemplosPage() {
+  const [code, setCode] = useState("");
+
   const sampleCode = `function calculateTotal() {
   let total = 0;
   for (const item of items) {
@@ -149,10 +154,7 @@ export default function ExemplosPage() {
         <section>
           <h2 className="mb-4 text-2xl font-semibold text-foreground">CodeEditor</h2>
           <Card className="w-full max-w-lg">
-            <CodeEditor
-              placeholder="// Paste your code here..."
-              defaultValue="function hello() {&#10;  console.log('Hello, World!');&#10;}"
-            />
+            <CodeEditor value={code} onChange={setCode} placeholder="// Paste your code here..." />
           </Card>
         </section>
       </div>

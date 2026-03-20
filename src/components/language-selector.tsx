@@ -9,7 +9,7 @@ const selectorVariants = tv({
 });
 
 export interface LanguageSelectorProps {
-  value: string;
+  value?: string;
   onChange: (language: string) => void;
   detectedLanguage?: string;
   className?: string;

@@ -23,7 +23,6 @@ export default function Home() {
   const [detectedLanguage, setDetectedLanguage] = useState<string | undefined>();
 
   const handleLanguageDetect = (detected: string) => {
-    console.log(detected)
     setDetectedLanguage(detected);
     setLanguage(detected);
   };
