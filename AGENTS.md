@@ -35,3 +35,8 @@ Ver `src/components/ui/AGENTS.md`
 ## Validação
 - Nas validações, rode apenas `npm run lint` por padrão
 - Execute `npm run build` apenas quando o usuário solicitar explicitamente
+
+## Commits
+- **NUNCA faça commit sem autorização explícita do usuário**
+- Aguarde o usuário solicitar o commit antes de executá-lo
+- Após implementar funcionalidades, aguarde análise do código antes de commitar

@@ -2,10 +2,23 @@
 
 Criar spec antes de implementar novas features.
 
-## Formato
+## Nome do Arquivo
 
-1. **Nome**: `feature-name.md`
-2. **Conteúdo**:
-   - **Objetivo**: O que a feature resolve
-   - **Comportamento esperado**: Como deve funcionar
-   - **Critérios de aceite**: Quando está pronto
+`feature-name.md`
+
+## Estrutura
+
+### Overview
+Breve descrição da feature
+
+### Funcionalidades
+Lista com checkboxes das features
+
+### Estrutura de Arquivos
+Organização dos arquivos a serem criados/modificados
+
+### To-Dos
+Lista de tarefas organizada por fases com checkboxes
+
+### Notas
+Observações adicionais

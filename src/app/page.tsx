@@ -1,9 +1,4 @@
-"use client";
-
 import Link from "next/link";
-import { useState } from "react";
-import { CodeEditor } from "@/components/code-editor";
-import { LanguageSelector } from "@/components/language-selector";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -14,19 +9,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Toggle } from "@/components/ui/toggle";
+import { HomeClient } from "./home-client";
 
 export default function Home() {
-  const [roastMode, setRoastMode] = useState(false);
-  const [code, setCode] = useState("");
-  const [language, setLanguage] = useState<string | undefined>(undefined);
-  const [detectedLanguage, setDetectedLanguage] = useState<string | undefined>();
-
-  const handleLanguageDetect = (detected: string) => {
-    setDetectedLanguage(detected);
-    setLanguage(detected);
-  };
-
   return (
     <main className="min-h-screen bg-background">
       <section className="mx-auto max-w-7xl px-6 py-16">
@@ -42,54 +27,7 @@ export default function Home() {
             {"// drop your code below and we'll rate it — brutally honest or full roast mode"}
           </p>
 
-          <div className="mb-8">
-            <Card>
-              <div className="mb-3 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="h-3 w-3 rounded-full bg-accent-red" />
-                  <div className="h-3 w-3 rounded-full bg-accent-amber" />
-                  <div className="h-3 w-3 rounded-full bg-accent-green" />
-                </div>
-                <LanguageSelector
-                  value={language}
-                  onChange={setLanguage}
-                  detectedLanguage={detectedLanguage}
-                />
-              </div>
-              <CodeEditor
-                value={code}
-                onChange={setCode}
-                language={language}
-                onLanguageChange={handleLanguageDetect}
-                isLimitExceeded={code.length > 2000}
-                placeholder={`// Paste your code here and get roasted!
-function add(a, b) {
-  return a + b;
-}`}
-              />
-            </Card>
-          </div>
-
-          <div className="mb-6 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Toggle checked={roastMode} onChange={setRoastMode}>
-                roast mode
-              </Toggle>
-              <span className="font-secondary text-xs text-text-tertiary">
-                {"// maximum sarcasm enabled"}
-              </span>
-            </div>
-
-            <Button variant="primary" disabled={code.length > 2000}>
-              <span className="text-accent-green">$</span> roast_my_code
-            </Button>
-          </div>
-
-          <div className="mb-12 flex items-center justify-center gap-6 font-secondary text-xs text-text-tertiary">
-            <span>2,847 codes roasted</span>
-            <span>·</span>
-            <span>avg score: 4.2/10</span>
-          </div>
+          <HomeClient />
         </div>
 
         <section className="mx-auto mt-16 max-w-7xl">

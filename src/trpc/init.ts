@@ -1,0 +1,16 @@
+import { initTRPC } from "@trpc/server";
+import { cache } from "react";
+import { db } from "@/db";
+
+export const createTRPCContext = cache(async () => {
+  return {
+    db,
+  };
+});
+
+export type Context = Awaited<ReturnType<typeof createTRPCContext>>;
+
+const t = initTRPC.context<Context>().create({});
+
+export const createTRPCRouter = t.router;
+export const baseProcedure = t.procedure;
