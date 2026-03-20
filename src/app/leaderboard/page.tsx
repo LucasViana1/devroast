@@ -1,64 +1,89 @@
-import { Card } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import type { Metadata } from "next";
 
-const mockLeaderboard = [
-  { rank: 1, user: "@devmaster", roastsGiven: 892, roastsReceived: 12, score: 9847 },
-  { rank: 2, user: "@codeNinja", roastsGiven: 756, roastsReceived: 28, score: 8234 },
-  { rank: 3, user: "@rustacean", roastsGiven: 634, roastsReceived: 5, score: 7891 },
-  { rank: 4, user: "@typescriptPro", roastsGiven: 589, roastsReceived: 15, score: 7123 },
-  { rank: 5, user: "@golangGuru", roastsGiven: 523, roastsReceived: 8, score: 6547 },
-  { rank: 6, user: "@pythonMaster", roastsGiven: 478, roastsReceived: 22, score: 5987 },
-  { rank: 7, user: "@reactWizard", roastsGiven: 412, roastsReceived: 11, score: 5234 },
-  { rank: 8, user: "@vueNinja", roastsGiven: 367, roastsReceived: 19, score: 4567 },
-  { rank: 9, user: "@svelteDev", roastsGiven: 298, roastsReceived: 7, score: 3891 },
-  { rank: 10, user: "@angularExpert", roastsGiven: 245, roastsReceived: 14, score: 3123 },
+import { LeaderboardEntry } from "@/components/ui/leaderboard-entry";
+
+export const metadata: Metadata = {
+  title: "Shame Leaderboard | devroast",
+  description: "The most roasted code on the internet",
+};
+
+const mockShameLeaderboard = [
+  {
+    rank: 1,
+    score: 1.2,
+    language: "javascript",
+    code: `var total = 0;
+for (var i = 0; i < items.length; i++) {
+  total = total + items[i].price;
+}`,
+  },
+  {
+    rank: 2,
+    score: 2.3,
+    language: "python",
+    code: `def get_data():
+    cursor.execute("SELECT * FROM users WHERE id = " + user_id)
+    return cursor.fetchone()`,
+  },
+  {
+    rank: 3,
+    score: 2.9,
+    language: "typescript",
+    code: `const process = (data: any) => {
+  const result: any = [];
+  for (let i = 0; i < data.length; i++) {
+    result.push(data[i]);
+  }
+  return result;
+};`,
+  },
+  {
+    rank: 4,
+    score: 3.4,
+    language: "go",
+    code: `func GetUser(id string) User {
+    rows, _ := db.Query("SELECT * FROM users WHERE id = ?", id)
+    defer rows.Close()
+    return User{}
+}`,
+  },
+  {
+    rank: 5,
+    score: 3.8,
+    language: "rust",
+    code: `fn main() {
+    let mut v = Vec::new();
+    for i in 0..100 { v.push(i); }
+    println!("{:?}", v);
+}`,
+  },
 ];
 
 export default function LeaderboardPage() {
   return (
-    <main className="min-h-screen bg-background">
-      <section className="mx-auto max-w-7xl px-6 py-16">
-        <h1 className="mb-8 font-primary text-3xl font-bold text-text-primary">Leaderboard</h1>
-        <Card>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Rank</TableHead>
-                <TableHead>Developer</TableHead>
-                <TableHead>Roasts Given</TableHead>
-                <TableHead>Roasts Received</TableHead>
-                <TableHead>Score</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {mockLeaderboard.map((entry) => (
-                <TableRow key={entry.rank}>
-                  <TableCell className="font-medium text-primary">
-                    {entry.rank <= 3 ? (
-                      <span className="text-accent-amber">
-                        {entry.rank === 1 ? "🥇" : entry.rank === 2 ? "🥈" : "🥉"}
-                      </span>
-                    ) : (
-                      entry.rank
-                    )}
-                  </TableCell>
-                  <TableCell>{entry.user}</TableCell>
-                  <TableCell>{entry.roastsGiven}</TableCell>
-                  <TableCell>{entry.roastsReceived}</TableCell>
-                  <TableCell className="font-semibold">{entry.score}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </Card>
-      </section>
+    <main className="flex min-h-screen flex-col bg-bg-page">
+      <div className="mx-auto w-full max-w-5xl px-10 py-10">
+        <section className="mb-10">
+          <h1 className="mb-4 flex items-center gap-3 font-primary text-[28px] font-bold text-text-primary">
+            <span className="text-accent-green">&gt;</span>
+            shame_leaderboard
+          </h1>
+          <p className="mb-3 font-secondary text-sm text-text-secondary">
+            {"// the most roasted code on the internet"}
+          </p>
+          <div className="flex items-center gap-2 font-secondary text-xs text-text-tertiary">
+            <span>2,847 submissions</span>
+            <span>·</span>
+            <span>avg score: 4.2/10</span>
+          </div>
+        </section>
+
+        <section className="flex flex-col gap-5">
+          {mockShameLeaderboard.map((entry) => (
+            <LeaderboardEntry key={entry.rank} {...entry} />
+          ))}
+        </section>
+      </div>
     </main>
   );
 }
