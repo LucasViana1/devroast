@@ -1,14 +1,8 @@
 import Link from "next/link";
+import { Suspense } from "react";
+import { ShameLeaderboard } from "@/components/shame-leaderboard";
+import { ShameLeaderboardSkeleton } from "@/components/skeletons/shame-leaderboard-skeleton";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { HomeClient } from "./home-client";
 
 export default function Home() {
@@ -44,68 +38,9 @@ export default function Home() {
             {"// the worst code on the internet, ranked by shame"}
           </p>
 
-          <Card>
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-bg-surface">
-                  <TableHead className="w-12">#</TableHead>
-                  <TableHead className="w-16">score</TableHead>
-                  <TableHead>code</TableHead>
-                  <TableHead className="w-24">lang</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <TableRow>
-                  <TableCell className="text-accent-amber">1</TableCell>
-                  <TableCell className="font-bold text-accent-red">1.2</TableCell>
-                  <TableCell className="font-primary text-xs">
-                    <div className="space-y-1">
-                      <p>eval(prompt(&quot;enter code&quot;))</p>
-                      <p>document.write(response)</p>
-                      <p className="text-text-tertiary">{"// trust the user lol"}</p>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-text-secondary">javascript</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="text-text-secondary">2</TableCell>
-                  <TableCell className="font-bold text-accent-red">1.8</TableCell>
-                  <TableCell className="font-primary text-xs">
-                    <div className="space-y-1">
-                      <p>
-                        if (x == true) {"{"} return true; {"}"}
-                      </p>
-                      <p>
-                        else if (x == false) {"{"} return false; {"}"}
-                      </p>
-                      <p>
-                        else {"{"} return !false; {"}"}
-                      </p>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-text-secondary">typescript</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="text-text-secondary">3</TableCell>
-                  <TableCell className="font-bold text-accent-red">2.1</TableCell>
-                  <TableCell className="font-primary text-xs">
-                    <div className="space-y-1">
-                      <p>SELECT * FROM users WHERE 1=1</p>
-                      <p className="text-text-tertiary">-- TODO: add authentication</p>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-text-secondary">sql</TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </Card>
-
-          <p className="mt-4 text-center font-secondary text-xs text-text-tertiary">
-            showing top 3 of 2,847 ·{" "}
-            <Link href="/leaderboard" className="text-text-secondary hover:underline">
-              view full leaderboard &gt;&gt;
-            </Link>
-          </p>
+          <Suspense fallback={<ShameLeaderboardSkeleton />}>
+            <ShameLeaderboard />
+          </Suspense>
         </section>
       </section>
     </main>
