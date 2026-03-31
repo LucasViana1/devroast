@@ -42,6 +42,7 @@ export const roasts = pgTable("roasts", {
     .references(() => submissions.id, { onDelete: "cascade" }),
   verdict: verdictEnum("verdict").notNull(),
   severity: severityEnum("severity").notNull(),
+  score: integer("score").notNull(),
   feedback: text("feedback").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
