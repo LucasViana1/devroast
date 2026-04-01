@@ -37,6 +37,40 @@ src/
 - Nas validações, rode apenas `npm run lint` por padrão
 - Execute `npm run build` apenas quando o usuário solicitar explicitamente
 
+### Playwright MCP para Validação de Layout e Integrações
+
+Para alterações que podem afetar o layout visual ou integrações com API, utilize o MCP do Playwright para validação:
+
+**Quando usar:**
+- Alterações em componentes de UI que podem impactar o layout
+- Modificações em pages que alteram a estrutura visual
+- Implementação de novas features com componentes interativos
+- Alterações em queries de API que afetam a renderização de dados
+
+**Como usar:**
+```bash
+# Navegar para a página
+playwright_browser_navigate(url: "http://localhost:3000")
+
+# Capturar snapshot da página
+playwright_browser_snapshot()
+
+# Validar elementos específicos
+playwright_browser_click(element: "button", ref: "element-id")
+
+# Validar texto presente
+playwright_browser_wait_for(text: "expected-text")
+```
+
+**Fluxo de validação recomendado:**
+1. Execute as alterações no código
+2. Navegue para a página afetada
+3. Capture o snapshot para análise visual
+4. Verifique se os elementos esperados estão presentes
+5. Teste interações (cliques, hover, etc.)
+
+**Nota:** O servidor de desenvolvimento deve estar rodando (`npm run dev`) antes de usar o Playwright MCP.
+
 ## Padrões Gerais
 
 ### Named Exports
