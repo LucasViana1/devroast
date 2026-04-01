@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import { ShameLeaderboard } from "@/components/shame-leaderboard";
+import ShameLeaderboard from "@/components/shame-leaderboard";
 import { ShameLeaderboardSkeleton } from "@/components/skeletons/shame-leaderboard-skeleton";
 import { Button } from "@/components/ui/button";
 import { HomeClient } from "./home-client";
