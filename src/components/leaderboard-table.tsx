@@ -2,9 +2,9 @@ import { sql } from "drizzle-orm";
 import { cacheLife } from "next/cache";
 import { db } from "@/db";
 import { roasts, submissions } from "@/db/schema";
-import { ShameLeaderboardUI } from "./shame-leaderboard-ui";
+import { LeaderboardTableUI } from "./leaderboard-table-ui";
 
-export default async function ShameLeaderboard() {
+export default async function LeaderboardTable() {
   "use cache";
   cacheLife("hours");
 
@@ -13,7 +13,7 @@ export default async function ShameLeaderboard() {
   );
   const totalRoasts = totalRoastsResult[0]?.count ?? 0;
 
-  const topShameResult = await db.execute<{
+  const leaderboardResult = await db.execute<{
     id: string;
     code: string;
     language: string;
@@ -28,11 +28,12 @@ export default async function ShameLeaderboard() {
       FROM ${submissions} s
       INNER JOIN ${roasts} r ON r.submission_id = s.id
       ORDER BY r.score ASC
-      LIMIT 3
+      LIMIT 20
     `
   );
 
-  const topThree = topShameResult.map((row) => ({
+  const entries = leaderboardResult.map((row, index) => ({
+    rank: index + 1,
     id: row.id,
     code: row.code,
     language: row.language,
@@ -40,9 +41,9 @@ export default async function ShameLeaderboard() {
   }));
 
   const data = {
-    topThree,
+    entries,
     totalRoasts,
   };
 
-  return <ShameLeaderboardUI data={data} />;
+  return <LeaderboardTableUI data={data} />;
 }
