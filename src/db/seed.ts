@@ -112,7 +112,7 @@ const CODE_TEMPLATES: Record<(typeof LANGUAGES)[number], string[]> = {
   ],
 };
 
-const LONG_CODE_5_LINES = `const express = require('express');
+const _LONG_CODE_5_LINES = `const express = require('express');
 const app = express();
 app.use(express.json());
 app.get('/api/users', async (req, res) => {
@@ -120,7 +120,7 @@ app.get('/api/users', async (req, res) => {
   res.json(users);
 });`;
 
-const LONG_CODE_10_LINES = `function processData(data) {
+const _LONG_CODE_10_LINES = `function processData(data) {
   if (!data) return null;
   const result = [];
   for (const item of data) {
@@ -340,7 +340,7 @@ const ROAST_FEEDBACKS = [
   "O código deveria ter testes. Eu deveria ter uma vida. Não temos nenhum dos dois.",
 ];
 
-const HONEST_FEEDBACKS = [
+const _HONEST_FEEDBACKS = [
   "Este código está bem escrito. A estrutura está clara e fácil de seguir.",
   "Boa implementação! Os nomes das variáveis são descritivos.",
   "Ótimo uso de tipagem forte. Facilita a manutenção futura.",
