@@ -9,7 +9,6 @@ import { MetricsSkeleton } from "@/components/metrics-skeleton";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Toggle } from "@/components/ui/toggle";
-import { convertSegmentPathToStaticExportFilename } from "next/dist/shared/lib/segment-cache/segment-value-encoding";
 
 export function HomeClient() {
   const router = useRouter();
