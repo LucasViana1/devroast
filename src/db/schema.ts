@@ -1,4 +1,4 @@
-import { integer, pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { integer, json, pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 
 export const roastModeEnum = pgEnum("roast_mode", ["honest", "roast"]);
 
@@ -44,6 +44,7 @@ export const roasts = pgTable("roasts", {
   severity: severityEnum("severity").notNull(),
   score: integer("score").notNull(),
   feedback: text("feedback").notNull(),
+  diff: json("diff"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
