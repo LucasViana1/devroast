@@ -282,3 +282,48 @@ export function AnimatedNumber({ value }: AnimatedNumberProps) {
 - [ ] Usar Suspense wrapping
 - [ ] Para números animados, usar number-flow
 - [ ] Testar lint
+
+## Open Graph Images
+
+### Estrutura da Rota
+
+OG images são geradas via API route em `src/app/api/og/[id]/route.tsx`.
+
+```
+/api/og/{submission_id}
+```
+
+**Exemplo:**
+```
+http://localhost:3000/api/og/c12dbb4b-3637-4227-9815-adae921502f5
+```
+
+### Como Usar
+
+A imagem OG é automaticamente vinculada via `generateMetadata` usando a tag `openGraph.images`:
+
+```typescript
+// src/app/results/[id]/page.tsx
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { id } = await params;
+  const baseUrl = process.env.NEXT_PUBLIC_URL || "http://localhost:3000";
+
+  return {
+    title: `Roast Result ${id} | devroast`,
+    description: "See how your code got roasted",
+    openGraph: {
+      images: [`${baseUrl}/api/og/${id}`],
+    },
+  };
+}
+```
+
+### Acesso
+
+- **Para compartilhamento:** A imagem é automaticamente incluída quando o link é compartilhado em redes sociais (a tag `<meta property="og:image">` é gerada automaticamente)
+- **Acesso direto:** Via URL `/{baseUrl}/api/og/{submission_id}`
+- **Preview:** Abra a URL direto no navegador para visualizar a imagem gerada
+
+### Biblioteca
+
+O projeto usa `@takumi-rs/image-response` para gerar as imagens. Veja a documentação em https://takumi.kane.tw/docs/migration/image-response
