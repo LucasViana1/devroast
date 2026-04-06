@@ -28,11 +28,28 @@ DevRoast is a code review platform where developers submit their code and receiv
 ## Getting Started
 
 ```bash
+# Install dependencies
 npm install
+
+# Start PostgreSQL container
+npm run db:docker:start
+
+# Start the database server (Drizzle Studio)
+npm run db:studio
+
+# Run the development server
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+### Seed (Optional)
+
+If you need sample data in the database, run:
+
+```bash
+npm run db:seed
+```
 
 ---
 
