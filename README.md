@@ -36,4 +36,45 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ---
 
+## Opencode
+
+Este projeto foi desenvolvido com auxíio do [opencode](https://opencode.ai), um assistente de IA para desenvolvimento de software.
+
+### Adicionando MCP ao Projeto
+
+Para integrar o opencode com este projeto, adicione o seguinte ao arquivo de configuração global em `~/.config/opencode/opencode.json`:
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "nome-do-mcp-1": {
+      "type": "local",
+      "command": [
+        "npx",
+        "@escopo/mcp@latest"
+      ],
+      "enabled": true
+    },
+    "nome-do-mcp-2": {
+      "type": "remote",
+      "url": "https://mcp.exemplo.com/mcp"
+    },
+    "nome-do-mcp-3": {
+      "command": [
+        "/caminho/para/app-mcp",
+        "--flag",
+        "valor"
+      ],
+      "enabled": true,
+      "type": "local"
+    }
+  }
+}
+```
+
+Consulte a [documentação do opencode](https://docs.opencode.ai) para mais informações sobre MCPs disponíveis.
+
+---
+
 Built with 🔥 during NLW by Rocketseat

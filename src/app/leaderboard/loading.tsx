@@ -1,14 +1,6 @@
-import type { Metadata } from "next";
-import { Suspense } from "react";
-import LeaderboardTable from "@/components/leaderboard-table";
 import { LeaderboardSkeleton } from "@/components/skeletons/leaderboard-skeleton";
 
-export const metadata: Metadata = {
-  title: "Shame Leaderboard | devroast",
-  description: "The most roasted code on the internet",
-};
-
-export default function LeaderboardPage() {
+export default function Loading() {
   return (
     <main className="flex min-h-screen flex-col bg-bg-page">
       <div className="mx-auto w-full max-w-5xl px-10 py-10">
@@ -22,9 +14,7 @@ export default function LeaderboardPage() {
           </p>
         </section>
 
-        <Suspense fallback={<LeaderboardSkeleton />}>
-          <LeaderboardTable />
-        </Suspense>
+        <LeaderboardSkeleton />
       </div>
     </main>
   );

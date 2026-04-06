@@ -112,6 +112,136 @@ const CODE_TEMPLATES: Record<(typeof LANGUAGES)[number], string[]> = {
   ],
 };
 
+const _LONG_CODE_5_LINES = `const express = require('express');
+const app = express();
+app.use(express.json());
+app.get('/api/users', async (req, res) => {
+  const users = await db.query('SELECT * FROM users');
+  res.json(users);
+});`;
+
+const _LONG_CODE_10_LINES = `function processData(data) {
+  if (!data) return null;
+  const result = [];
+  for (const item of data) {
+    if (item.active) {
+      const transformed = {
+        id: item.id,
+        name: item.name.toUpperCase(),
+        email: item.email || 'unknown',
+        created: new Date(item.createdAt),
+        status: item.active ? 'active' : 'inactive'
+      };
+      result.push(transformed);
+    }
+  }
+  return result.sort((a, b) => a.name.localeCompare(b.name));
+}`;
+
+const LONG_CODES = [
+  `function processData(data) {
+  if (!data) return null;
+  const result = [];
+  for (const item of data) {
+    if (item.active) {
+      const transformed = {
+        id: item.id,
+        name: item.name.toUpperCase(),
+        email: item.email || 'unknown'
+      };
+      result.push(transformed);
+    }
+  }
+  return result;
+}`,
+  `const express = require('express');
+const app = express();
+app.use(express.json());
+app.get('/api/users', async (req, res) => {
+  const users = await db.query('SELECT * FROM users');
+  res.json(users);
+});`,
+  `def process_items(items):
+    result = []
+    for item in items:
+        if item['active']:
+            processed = {
+                'id': item['id'],
+                'name': item['name'].upper(),
+                'value': item.get('value', 0)
+            }
+            result.append(processed)
+    return result`,
+  `async function fetchData() {
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+    return data.map(item => ({
+      id: item.id,
+      name: item.name,
+      status: 'active'
+    }));
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+}`,
+  `class DataProcessor {
+  process(items) {
+    return items
+      .filter(i => i.active)
+      .map(i => ({
+        id: i.id,
+        name: i.name.toUpperCase()
+      }));
+  }
+}`,
+  `const handleRequest = (req, res) => {
+  const { id, type } = req.params;
+  if (!id) {
+    return res.status(400).json({ error: 'Missing id' });
+  }
+  const data = database.getById(id);
+  res.json(data);
+};`,
+  `def calculate_metrics(data):
+    total = 0
+    count = 0
+    for item in data:
+        if item.get('active'):
+            total += item.get('value', 0)
+            count += 1
+    return total / count if count > 0 else 0`,
+  `function transform(input) {
+  const output = [];
+  for (let i = 0; i < input.length; i++) {
+    const item = input[i];
+    if (item.enabled) {
+      output.push({
+        key: item.key,
+        value: item.value,
+        timestamp: Date.now()
+      });
+    }
+  }
+  return output;
+}`,
+  `const processUsers = (users) => {
+  return users
+    .filter(user => user.isActive)
+    .map(user => ({
+      id: user.id,
+      name: user.name,
+      email: user.email
+    }));
+};`,
+  `async function loadData() {
+  const response = await fetch('/api/data');
+  const json = await response.json();
+  return json.filter(item => item.active);
+}`,
+];
+
 const ROAST_FEEDBACKS = [
   "Este código parece ter sido escrito às 3 da manhã após 12 xícaras de café. Não que eu esteja julgando.",
   "Imagino que você tenha escrito isso com os olhos fechados. Talvez literalmente, considerando a indentação.",
@@ -210,7 +340,7 @@ const ROAST_FEEDBACKS = [
   "O código deveria ter testes. Eu deveria ter uma vida. Não temos nenhum dos dois.",
 ];
 
-const HONEST_FEEDBACKS = [
+const _HONEST_FEEDBACKS = [
   "Este código está bem escrito. A estrutura está clara e fácil de seguir.",
   "Boa implementação! Os nomes das variáveis são descritivos.",
   "Ótimo uso de tipagem forte. Facilita a manutenção futura.",
@@ -476,6 +606,21 @@ function randomChoices<T>(arr: readonly T[], count: number): T[] {
   return shuffled.slice(0, count);
 }
 
+function generateScore(severity: string): number {
+  switch (severity) {
+    case "critical":
+      return Math.round((0.5 + Math.random() * 1.5) * 10);
+    case "error":
+      return Math.round((2.0 + Math.random() * 2.0) * 10);
+    case "warning":
+      return Math.round((4.0 + Math.random() * 2.5) * 10);
+    case "info":
+      return Math.round((6.5 + Math.random() * 3.0) * 10);
+    default:
+      return Math.round((4.0 + Math.random() * 2.0) * 10);
+  }
+}
+
 async function seed() {
   console.log("🌱 Starting seed...\n");
 
@@ -492,9 +637,23 @@ async function seed() {
 
   for (let i = 0; i < ROAST_COUNT; i++) {
     const language = randomChoice(LANGUAGES);
-    const roastMode = Math.random() > 0.3 ? "roast" : "honest";
-    const codeTemplates = CODE_TEMPLATES[language];
-    const code = randomChoice(codeTemplates);
+    const roastMode = "roast";
+
+    let code: string;
+    let score: number;
+    let severity: "info" | "warning" | "error" | "critical";
+
+    if (i < 10) {
+      code = randomChoice(LONG_CODES);
+      const lowScores = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+      score = lowScores[i];
+      severity = "critical";
+    } else {
+      const codeTemplates = CODE_TEMPLATES[language];
+      code = randomChoice(codeTemplates);
+      severity = randomChoice(["info", "warning", "error", "critical"] as const);
+      score = generateScore(severity);
+    }
 
     const [submission] = await db
       .insert(submissions)
@@ -506,8 +665,7 @@ async function seed() {
       .returning();
 
     const verdict = randomChoice(["good", "warning", "error"] as const);
-    const severity = randomChoice(["info", "warning", "error", "critical"] as const);
-    const feedbackPool = roastMode === "roast" ? ROAST_FEEDBACKS : HONEST_FEEDBACKS;
+    const feedbackPool = ROAST_FEEDBACKS;
     const feedback = randomChoice(feedbackPool);
 
     const [roast] = await db
@@ -516,6 +674,7 @@ async function seed() {
         submissionId: submission.id,
         verdict,
         severity,
+        score,
         feedback,
       })
       .returning();
