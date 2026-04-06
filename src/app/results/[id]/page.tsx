@@ -12,9 +12,14 @@ export interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;
+  const baseUrl = process.env.NEXT_PUBLIC_URL || "http://localhost:3000";
+
   return {
     title: `Roast Result ${id} | devroast`,
     description: "See how your code got roasted",
+    openGraph: {
+      images: [`${baseUrl}/api/og/${id}`],
+    },
   };
 }
 
